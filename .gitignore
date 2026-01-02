@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.venv/
+.ENV
+.ENV/
+.venv.bak/
+.venv/
+.venv/
+.python-version
+*.so
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# CLAUDE related
+.claude/
+.claude.json
+.claude.json.backup
+.claude.json.corrupted.*
+
+# Windows
+$RECYCLE.BIN/
+Desktop.ini
+ehthumbs.db
+Icon?
