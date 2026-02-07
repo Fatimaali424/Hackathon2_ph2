@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "settings": {
+    "frameworkVersion": "14.x",
+    "rootDirectory": "frontend"
+  },
+  "env": {
+    "NEXT_PUBLIC_API_BASE_URL": {
+      "description": "Base URL for the backend API",
+      "required": true
+    }
+  }
+}
