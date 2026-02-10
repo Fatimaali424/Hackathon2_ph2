@@ -1,0 +1,17 @@
+# Railway Configuration File
+# This file defines how your services are deployed on Railway
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "./backend/Dockerfile"
+
+[deploy]
+numReplicas = 1
+restartPolicy = "always"
+restartPolicyMaxRetries = 3
+
+[variables]
+JWT_SECRET_KEY = { required = true, desc = "Secret key for JWT tokens" }
+DATABASE_URL = { required = true, desc = "PostgreSQL database connection string" }
+ACCESS_TOKEN_EXPIRE_MINUTES = { required = false, default = "30", desc = "Access token expiration in minutes" }
+ENVIRONMENT = "production"

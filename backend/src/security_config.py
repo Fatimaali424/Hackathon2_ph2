@@ -41,7 +41,7 @@ def add_security_headers(app: FastAPI):
     origins = ["*"] if env == "development" else [
         "http://localhost:3000",
         "https://yourdomain.com",
-        "https://www.yourdomain.com"
+        "https://frontend-i11zeym6x-fatimaali424s-projects.vercel.app/"
     ]
 
     app.add_middleware(
