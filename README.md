@@ -199,6 +199,50 @@ For production deployment, ensure you:
 
 This project is licensed under the MIT License.
 
+## 🤖 Hugging Face Spaces Deployment
+
+To deploy this application on Hugging Face Spaces with proper port configuration, follow these steps:
+
+### 1. Prepare Environment Variables
+- `JWT_SECRET_KEY`: (Required) A strong secret key for JWT token signing
+- `DATABASE_URL`: (Optional) PostgreSQL connection string. If not provided, the app will use SQLite
+- `ENVIRONMENT`: Set to "production" (defaults to "production")
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration time in minutes (defaults to 30)
+
+### 2. Space Configuration
+The application is designed to work with Hugging Face Spaces. The `space.yaml` file is located in the backend directory.
+
+### 3. Port Configuration
+The application is configured to use the PORT environment variable provided by Hugging Face Spaces. The main.py file has been updated to:
+
+```python
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    
+    # Use PORT from environment variables (required for Hugging Face Spaces)
+    # Default to 8000 if PORT is not set (for local development)
+    port = int(os.environ.get("PORT", 8000))
+    
+    # Run the application with the dynamically determined port
+    uvicorn.run(
+        "src.main:app",  # Reference the app via module path
+        host="0.0.0.0",
+        port=port,
+        reload=False,  # Disable reload in production environments
+        log_level="info"  # Set appropriate log level
+    )
+```
+
+### 4. Docker Configuration
+The Dockerfile has been updated to use the proper command:
+
+```dockerfile
+CMD ["python", "-m", "src.main"]
+```
+
+This ensures the application uses the dynamic port configuration when deployed to Hugging Face Spaces.
+
 ## 📞 Support
 
 If you have any questions or need help, feel free to open an issue in the repository.

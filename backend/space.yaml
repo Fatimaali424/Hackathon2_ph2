@@ -1,0 +1,49 @@
+runtime: python:3.11
+emoji: 🚀
+title: Todo Full-Stack Web Application
+description: A secure, multi-user todo application with authentication and data isolation
+
+secrets:
+  - key: JWT_SECRET_KEY
+    name: JWT Secret Key
+    description: Secret key for JWT tokens (use a strong random value)
+    required: true
+  - key: DATABASE_URL
+    name: Database URL
+    description: PostgreSQL connection string
+    required: false
+    default: sqlite:///./todo_app.db
+
+variables:
+  - key: ENVIRONMENT
+    name: Environment
+    description: Application environment
+    default: production
+  - key: ACCESS_TOKEN_EXPIRE_MINUTES
+    name: Access Token Expiry (minutes)
+    description: How long JWT tokens remain valid
+    default: "30"
+
+python_packages:
+  - fastapi==0.104.1
+  - uvicorn[standard]==0.24.0
+  - sqlmodel==0.0.16
+  - pydantic[email]==2.5.0
+  - passlib[bcrypt]==1.7.4
+  - python-jose[cryptography]==3.3.0
+  - python-multipart==0.0.6
+  - python-dotenv==1.0.0
+  - httpx==0.27.2
+  - redis==7.1.0
+  - psycopg2-binary==2.9.9
+  - alembic==1.13.1
+  - asyncpg==0.29.0
+
+commands:
+  - pip install -r requirements.txt
+
+app_file: src.main
+app_obj: app
+
+assets:
+  - https://huggingface.co/datasets/huggingface/production-readme-assets/resolve/main/huggingface_logo-noborder.svg

@@ -30,8 +30,13 @@ def create_app():
     # add_rate_limits(app)
 
     # Initialize database tables
-    init_db()
-    app_logger.info("Database initialized successfully")
+    try:
+        init_db()
+        app_logger.info("Database initialized successfully")
+    except Exception as e:
+        app_logger.error(f"Database initialization failed: {str(e)}")
+        # Continue without database initialization for environments like Hugging Face Spaces
+        # where database might not be immediately available
 
     # Include API routers
     app.include_router(auth_router, prefix=API_PREFIX)
@@ -45,12 +50,21 @@ def create_app():
     # Health check endpoint
     @app.get("/health")
     def health_check():
-        from src.database.health_check import check_database_health
-        db_status = check_database_health()
-        app_logger.info(f"Health check requested, database status: {db_status['database']['status'] if isinstance(db_status['database'], dict) else 'unknown'}")
+        try:
+            from src.database.health_check import check_database_health
+            db_status = check_database_health()
+            app_logger.info(f"Health check requested, database status: {db_status['database']['status'] if isinstance(db_status['database'], dict) else 'unknown'}")
+        except Exception as e:
+            app_logger.error(f"Health check failed: {str(e)}")
+            db_status = {
+                "status": "unhealthy",
+                "database": "connection failed",
+                "error": str(e),
+                "timestamp": __import__('datetime').datetime.utcnow().isoformat()
+            }
 
         return {
-            "status": "healthy",
+            "status": "healthy" if db_status.get("status") == "healthy" else "degraded",
             "environment": ENVIRONMENT,
             "database": db_status
         }
@@ -58,10 +72,14 @@ def create_app():
     # Add exception handlers
     @app.middleware("http")
     async def log_requests(request, call_next):
-        app_logger.info(f"Incoming request: {request.method} {request.url.path}")
-        response = await call_next(request)
-        app_logger.info(f"Response status: {response.status_code}")
-        return response
+        try:
+            app_logger.info(f"Incoming request: {request.method} {request.url.path}")
+            response = await call_next(request)
+            app_logger.info(f"Response status: {response.status_code}")
+            return response
+        except Exception as e:
+            app_logger.error(f"Request processing error: {str(e)}")
+            raise
 
     @app.exception_handler(Exception)
     async def global_exception_handler(request, exc):
@@ -76,4 +94,17 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    
+    # Use PORT from environment variables (required for Hugging Face Spaces)
+    # Default to 8000 if PORT is not set (for local development)
+    port = int(os.environ.get("PORT", 7860))
+    
+    # Run the application with the dynamically determined port
+    uvicorn.run(
+        "src.main:app",  # Reference the app via module path
+        host="0.0.0.0",
+        port=port,
+        reload=False,  # Disable reload in production environments
+        log_level="info"  # Set appropriate log level
+    )
